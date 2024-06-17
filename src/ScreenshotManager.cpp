@@ -15,11 +15,16 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
     log::info("okay created the renderer");
 
     renderer->begin();
-    bool uivisible = nodeIsVisible(PlayLayer::get()->getChildByID("UILayer"));
+    /*bool uivisible = nodeIsVisible(PlayLayer::get()->getChildByID("UILayer"));
     bool progvisible = nodeIsVisible(PlayLayer::get()->getChildByID("progress-bar"));
     bool percvisible = nodeIsVisible(PlayLayer::get()->getChildByID("percentage-label"));
     bool p1visible = nodeIsVisible(PlayLayer::get()->m_player1);
-    bool p2visible = nodeIsVisible(PlayLayer::get()->m_player2);
+    bool p2visible = nodeIsVisible(PlayLayer::get()->m_player2);*/
+    bool uivisible = true;
+    bool progvisible = true;
+    bool percvisible = true;
+    bool p1visible = true;
+    bool p2visible = true;
     if (PlayLayer::get() && hideUI) {
         PlayLayer::get()->getChildByID("UILayer")->setVisible(false);
         PlayLayer::get()->getChildByID("progress-bar")->setVisible(false);
