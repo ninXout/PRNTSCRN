@@ -11,7 +11,7 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
     Screenshot ss;
 
     auto size = CCDirector::sharedDirector()->getWinSize();
-    auto renderer = CCRenderTexture::create(size.width, size.height, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+    auto renderer = CCRenderTexture::create(size.width, size.height, cocos2d::kCCTexture2DPixelFormat_RGB888);
     log::info("okay created the renderer");
 
     renderer->begin();
