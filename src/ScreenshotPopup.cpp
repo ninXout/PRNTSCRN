@@ -23,14 +23,6 @@ bool ScreenshotPopup::setup() {
     btn->setPosition(ccp(221.f, 25.f));
     menu->addChild(btn);
 
-    auto btn2 = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Close"),
-        this,
-        menu_selector(ScreenshotPopup::keyBackClicked)
-    );
-    btn2->setPosition(ccp(79.f, 25.f));
-    menu->addChild(btn2);
-
     CCMenu* toggle1 = CCMenu::create();
     toggle1->setLayout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(1.f));
     toggle1->setPosition(ccp(285.f, 190.f));
