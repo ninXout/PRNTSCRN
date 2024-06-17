@@ -12,6 +12,7 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
 
     auto size = CCDirector::sharedDirector()->getWinSize();
     auto renderer = CCRenderTexture::create(size.width, size.height, cocos2d::kCCTexture2DPixelFormat_RGBA8888);
+    log::info("okay created the renderer");
 
     renderer->begin();
     bool uivisible = nodeIsVisible(PlayLayer::get()->getChildByID("UILayer"));
@@ -29,6 +30,7 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
         PlayLayer::get()->m_player2->setVisible(false);
     }
     if (static_cast<CCNode*>(CCDirector::get()->getRunningScene())->getChildrenCount()) {
+        log::info("started visiting");
         CCArrayExt<CCNode*> children = CCDirector::get()->getRunningScene()->getChildren();
         for (auto* child : children) {
             if (child->getID() == "PauseLayer" || child->getID() == "ScreenshotPopup") {
@@ -37,6 +39,7 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
                 child->visit();
             }
         }
+        log::info("finished visiting");
     }
     renderer->end();
     if (PlayLayer::get() && hideUI) {
@@ -91,24 +94,33 @@ void Screenshot::saveImage(bool toClipboard) {
     const auto src_height = static_cast<unsigned int>(contentSize.height);
     a = a ? a : src_width;
     b = b ? b : src_height;
-    std::thread([=]() {
+    log::info("about to start windows thread");
+    std::thread([this]() {
+        log::info("inside windows thread");
         auto len = static_cast<size_t>((a - x) * (b - y));
         auto buffer = static_cast<uint32_t*>(malloc(len * sizeof(uint32_t)));
+        log::info("buffer made");
         auto cx = x, cy = y;
         for (size_t i = 0; i < len; ++i) {
             const size_t j = ((src_height - cy) * src_width + cx) << 2;
             if (++cx == a) ++cy, cx = x;
             buffer[i] = imageData[j] << 16 | imageData[j + 1] << 8 | imageData[j + 2];
         }
+        log::info("buffer finished");
         auto bitmap = CreateBitmap((a - x), (b - y), 1, 32, buffer);
+        log::info("bitmap created");
 
         if (OpenClipboard(NULL))
             if (EmptyClipboard()) {
+                log::info("clipboard opened and emptied");
                 SetClipboardData(CF_BITMAP, bitmap);
+                log::info("clipboard data set");
                 CloseClipboard();
             }
         free(buffer);
         free(imageData);
+        log::info("freed the stuff");
     }).detach();
+    log::info("left the windows thread");
 }
 #endif
