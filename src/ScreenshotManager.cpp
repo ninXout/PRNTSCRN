@@ -95,7 +95,7 @@ void Screenshot::saveImage(bool toClipboard) {
     a = a ? a : src_width;
     b = b ? b : src_height;
     log::info("about to start windows thread");
-    std::thread([this]() {
+    std::thread([=]() {
         log::info("inside windows thread");
         auto len = static_cast<size_t>((a - x) * (b - y));
         auto buffer = static_cast<uint32_t*>(malloc(len * sizeof(uint32_t)));
