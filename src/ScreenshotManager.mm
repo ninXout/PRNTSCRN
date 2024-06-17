@@ -1,3 +1,4 @@
+#ifdef GEODE_IS_MACOS
 #define CommentType CommentTypeDummy
 #include <CoreGraphics/CoreGraphics.h>
 #include <ImageIO/ImageIO.h>
@@ -32,8 +33,6 @@ bool CGImageWriteToFile(CGImageRef image, std::string name) {
     CFRelease(destination);
     return true;
 }
-
-#ifdef GEODE_IS_MACOS
 
 void Screenshot::saveImage(bool toClipboard) {
     float width = contentSize.width;
