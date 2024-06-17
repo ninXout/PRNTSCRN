@@ -1,0 +1,17 @@
+{
+	"geode": "3.0.0-beta.1",
+	"gd": {
+		"mac": "2.206",
+		"win": "2.206"
+	},
+	"version": "v1.0.0",
+	"id": "ninxout.prntscrn",
+	"name": "PRNTSCRN",
+	"developer": "ninXout",
+	"description": "",
+	"resources": {
+        "sprites": [
+            "resources/PS_screenshot.png"
+        ]
+    }
+}
