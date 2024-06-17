@@ -1,4 +1,4 @@
-#ifdef GEODE_IS_MACOS
+#ifdef __APPLE__
 #define CommentType CommentTypeDummy
 #include <CoreGraphics/CoreGraphics.h>
 #include <ImageIO/ImageIO.h>
