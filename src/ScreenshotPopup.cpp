@@ -12,8 +12,8 @@ CCMenu* ScreenshotPopup::createSetting(const std::string& title, const std::stri
 
     CCMenuItemToggler* toggler = Build<CCMenuItemToggler>::createToggle(CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"), CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"), 
     [&](CCMenuItemToggler* toggler){ 
+        toggler->toggle(!Mod::get()->getSettingValue<bool>(key));
         Mod::get()->setSettingValue<bool>(key, !Mod::get()->getSettingValue<bool>(key));
-        toggler->toggle(Mod::get()->getSettingValue<bool>(key));
     })
         .scale(0.75f)
         .parent(thing)
@@ -86,7 +86,7 @@ bool ScreenshotPopup::setup() {
 }
 
 void ScreenshotPopup::onScreenshot(CCObject*) {
-    Screenshot::create(Mod::get()->getSavedValue<bool>("hide-player"), Mod::get()->getSavedValue<bool>("hide-ui")).saveImage(Mod::get()->getSavedValue<bool>("copy-clipboard"));
+    Screenshot::create(Mod::get()->getSettingValue<bool>("hide-player"), Mod::get()->getSettingValue<bool>("hide-ui")).saveImage(Mod::get()->getSettingValue<bool>("copy-clipboard"));
 }
 
 void ScreenshotPopup::textChanged(CCTextInputNode* p0) {
