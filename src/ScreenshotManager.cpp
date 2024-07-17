@@ -42,6 +42,15 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
                 // nothing
             } else {
                 child->visit();
+                /*if (child->getID() == "LevelEditorLayer" && child->getChildByID("EditorPauseLayer") && child->getChildByID("EditorUI") && static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))) {
+                    child->getChildByID("EditorUI")->setVisible(false);
+                    child->getChildByID("EditorPauseLayer")->setVisible(false);
+                    static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))->setVisible(false);
+                    child->visit();
+                    child->getChildByID("EditorPauseLayer")->setVisible(true);
+                    child->getChildByID("EditorUI")->setVisible(true);
+                    static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))->setVisible(true);
+                }*/
             }
         }
         log::info("finished visiting");
@@ -57,14 +66,7 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
         PlayLayer::get()->m_player2->setVisible(p2visible);
     }
 
-    // TODO: do the CustomRenderTexture thing for mac as well cuz its faster
-    #ifdef GEODE_IS_WINDOWS
     ss.imageData = static_cast<CustomRenderTexture*>(renderer)->getData();
-    #endif
-    #ifdef GEODE_IS_MACOS
-    CCImage* image = renderer->newCCImage(true);
-    ss.imageData = image->getData();
-    #endif
     ss.contentSize = static_cast<CustomRenderTexture*>(renderer)->getSizeInPixels();
 
     return ss;
@@ -91,28 +93,13 @@ std::string Screenshot::getFileName() {
 
 #ifdef GEODE_IS_WINDOWS
 void Screenshot::saveImage(bool toClipboard) {
-    unsigned int x = 0;
-    unsigned int y = 0;
-    unsigned int a = 0;
-    unsigned int b = 0; // TODO: image cropping
+    // TODO: image cropping
     const auto src_width = static_cast<unsigned int>(contentSize.width);
     const auto src_height = static_cast<unsigned int>(contentSize.height);
-    a = a ? a : src_width;
-    b = b ? b : src_height;
     log::info("about to start windows thread");
     std::thread([=]() {
         log::info("inside windows thread");
-        auto len = static_cast<size_t>((a - x) * (b - y));
-        auto buffer = static_cast<uint32_t*>(malloc(len * sizeof(uint32_t)));
-        log::info("buffer made");
-        auto cx = x, cy = y;
-        for (size_t i = 0; i < len; ++i) {
-            const size_t j = ((src_height - cy) * src_width + cx) << 2;
-            if (++cx == a) ++cy, cx = x;
-            buffer[i] = imageData[j] << 16 | imageData[j + 1] << 8 | imageData[j + 2];
-        }
-        log::info("buffer finished");
-        auto bitmap = CreateBitmap((a - x), (b - y), 1, 32, buffer);
+        auto bitmap = CreateBitmap(src_width, src_height, 1, 32, buffer);
         log::info("bitmap created");
 
         if (OpenClipboard(NULL))
@@ -123,7 +110,6 @@ void Screenshot::saveImage(bool toClipboard) {
                 CloseClipboard();
             }
         free(buffer);
-        free(imageData);
         log::info("freed the stuff");
     }).detach();
     log::info("left the windows thread");

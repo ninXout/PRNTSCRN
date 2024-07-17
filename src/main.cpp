@@ -12,7 +12,7 @@ class $modify(NewPauseLayer, PauseLayer) {
 		auto menu = CCMenu::create();
 
 		auto btn = CCMenuItemSpriteExtra::create(
-			CCSprite::createWithSpriteFrameName("GJ_helpBtn2_001.png"),
+			CCSprite::create("PS_screenshot.png"_spr),
 			this,
 			menu_selector(NewPauseLayer::onScreenshotPopup)
 		);
