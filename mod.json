@@ -13,5 +13,39 @@
         "sprites": [
             "resources/PS_screenshot.png"
         ]
-    }
+    },
+	"settings": {
+		"auto-screenshot": {
+            "name": "Auto Screenshot",
+            "description": "Automatically screenshot at a certain percentage (specified using the Auto Screenshot Percent setting)",
+            "type": "bool",
+            "default": false
+        },
+        "auto-percent": {
+            "name": "Auto Screenshot Percent",
+            "description": "The percentage that PRNTSCRN should automatically take a screenshot at (if Auto Screenshot is on)",
+            "type": "int",
+            "default": 0,
+			"min": 0,
+			"max": 100
+        },
+		"copy-clipboard": {
+            "name": "Copy to Clipboard",
+            "description": "Copy screenshots to the clipboard instead of saving them as a file",
+            "type": "bool",
+            "default": true
+        },
+		"hide-player": {
+            "name": "Hide Player Icon",
+            "description": "Hide the player icon in screenshots",
+            "type": "bool",
+            "default": false
+        },
+		"hide-ui": {
+            "name": "Hide UI",
+            "description": "Hide the UI (percentage bar and label, any labels from mods, etc.)",
+            "type": "bool",
+            "default": false
+        }
+	}
 }

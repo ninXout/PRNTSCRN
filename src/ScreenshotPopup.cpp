@@ -1,7 +1,33 @@
 #include "ScreenshotPopup.hpp"
 #include "ScreenshotManager.hpp"
+#include <UIBuilder.hpp>
 
 using namespace geode::prelude;
+
+CCMenu* ScreenshotPopup::createSetting(const std::string& title, const std::string& key) {
+    CCMenu* thing = Build<CCMenu>(CCMenu::create())
+        .layout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(1.f))
+        .width(235.f)
+        .collect();
+
+    CCMenuItemToggler* toggler = Build<CCMenuItemToggler>::createToggle(CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png"), CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"), 
+    [&](CCMenuItemToggler* toggler){ 
+        Mod::get()->setSettingValue<bool>(key, !Mod::get()->getSettingValue<bool>(key));
+        toggler->toggle(Mod::get()->getSettingValue<bool>(key));
+    })
+        .scale(0.75f)
+        .parent(thing)
+        .collect();
+
+    toggler->toggle(Mod::get()->getSettingValue<bool>(key));
+
+    Build<CCLabelBMFont>::create(title.c_str(), "bigFont.fnt")
+        .scale(0.4f)
+        .parent(thing);
+    
+    thing->updateLayout();
+    return thing;
+}
 
 bool ScreenshotPopup::setup() {
     this->setTitle("Screenshot");
@@ -23,47 +49,48 @@ bool ScreenshotPopup::setup() {
     btn->setPosition(ccp(221.f, 25.f));
     menu->addChild(btn);
 
-    CCMenu* toggle1 = CCMenu::create();
-    toggle1->setLayout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(1.f));
-    toggle1->setPosition(ccp(285.f, 190.f));
-    toggle1->setContentWidth(235.f);
-    menu->addChild(toggle1);
-    copyClipboardToggle = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 0.75f);
-    toggle1->addChild(copyClipboardToggle);
-    CCLabelBMFont* copyClipboardLabel = CCLabelBMFont::create("Copy to Clipboard", "bigFont.fnt");
-    copyClipboardLabel->setScale(0.4f);
-    toggle1->addChild(copyClipboardLabel);
-    toggle1->updateLayout();
+    CCMenu* settingsMenu = CCMenu::create();
+    settingsMenu->setPosition(ccp(300.f, 130.f));
+    settingsMenu->setContentWidth(240.f);
+    settingsMenu->setLayout(ColumnLayout::create()->setAutoScale(false)->setAxisReverse(true));
 
-    CCMenu* toggle2 = CCMenu::create();
-    toggle2->setLayout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(1.f));
-    toggle2->setPosition(ccp(285.f, 160.f));
-    toggle2->setContentWidth(235.f);
-    menu->addChild(toggle2);
-    hidePlayerToggle = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 0.75f);
-    toggle2->addChild(hidePlayerToggle);
-    CCLabelBMFont* hidePlayerLabel = CCLabelBMFont::create("Hide Player Icon", "bigFont.fnt");
-    hidePlayerLabel->setScale(0.4f);
-    toggle2->addChild(hidePlayerLabel);
-    toggle2->updateLayout();
+    settingsMenu->addChild(createSetting("Copy To Clipboard", "copy-clipboard"));
+    settingsMenu->addChild(createSetting("Hide Player Icon", "hide-player"));
+    settingsMenu->addChild(createSetting("Hide UI Layer", "hide-ui"));
+    settingsMenu->addChild(createSetting("Auto Screenshot", "auto-screenshot"));
 
-    CCMenu* toggle3 = CCMenu::create();
-    toggle3->setLayout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(1.f));
-    toggle3->setPosition(ccp(285.f, 130.f));
-    toggle3->setContentWidth(235.f);
-    menu->addChild(toggle3);
-    hideUIToggle = CCMenuItemToggler::createWithStandardSprites(this, nullptr, 0.75f);
-    toggle3->addChild(hideUIToggle);
-    CCLabelBMFont* hideUILabel = CCLabelBMFont::create("Hide UI Layer", "bigFont.fnt");
-    hideUILabel->setScale(0.4f);
-    toggle3->addChild(hideUILabel);
-    toggle3->updateLayout();
+    CCMenu* autoPercent = Build<CCMenu>::create()
+        .layout(RowLayout::create()->setAutoScale(false)->setAxisAlignment(AxisAlignment::Start)->setGap(4.f))
+        .width(230.f)
+        .parent(settingsMenu)
+        .collect();
+
+    auto* input = Build<InputNode>::create(25.f, "%", "bigFont.fnt", "1234567890", 2)
+        .scale(0.75f)
+        .parent(autoPercent)
+        .collect();
+
+    input->setString(std::to_string(Mod::get()->getSettingValue<int64_t>("auto-percent")));
+    input->getInput()->setDelegate(this);
+
+    Build<CCLabelBMFont>::create("Auto Percent", "bigFont.fnt")
+        .scale(0.4f)
+        .parent(autoPercent);
+
+    autoPercent->updateLayout();
+
+    m_mainLayer->addChild(settingsMenu);
+    settingsMenu->updateLayout();
 
     return true;
 }
 
 void ScreenshotPopup::onScreenshot(CCObject*) {
-    Screenshot::create(hidePlayerToggle->isToggled(), hideUIToggle->isToggled()).saveImage(copyClipboardToggle->isToggled());
+    Screenshot::create(Mod::get()->getSavedValue<bool>("hide-player"), Mod::get()->getSavedValue<bool>("hide-ui")).saveImage(Mod::get()->getSavedValue<bool>("copy-clipboard"));
+}
+
+void ScreenshotPopup::textChanged(CCTextInputNode* p0) {
+    Mod::get()->setSettingValue<int64_t>("auto-percent", std::stoi(p0->getString()));
 }
 
 ScreenshotPopup* ScreenshotPopup::create() {

@@ -11,60 +11,32 @@ Screenshot Screenshot::create(bool hidePlayer, bool hideUI) {
     Screenshot ss;
 
     auto size = CCDirector::sharedDirector()->getWinSize();
-    auto renderer = CCRenderTexture::create(size.width, size.height, cocos2d::kCCTexture2DPixelFormat_RGB888);
-    log::info("okay created the renderer");
+    CCRenderTexture* renderer = CCRenderTexture::create(size.width, size.height, cocos2d::kCCTexture2DPixelFormat_RGB888);
+    log::info("okay created the renderer: {}", renderer ? "true" : "false");
 
     renderer->begin();
-    /*bool uivisible = nodeIsVisible(PlayLayer::get()->getChildByID("UILayer"));
-    bool progvisible = nodeIsVisible(PlayLayer::get()->getChildByID("progress-bar"));
-    bool percvisible = nodeIsVisible(PlayLayer::get()->getChildByID("percentage-label"));
-    bool p1visible = nodeIsVisible(PlayLayer::get()->m_player1);
-    bool p2visible = nodeIsVisible(PlayLayer::get()->m_player2);*/
-    bool uivisible = true;
-    bool progvisible = true;
-    bool percvisible = true;
-    bool p1visible = true;
-    bool p2visible = true;
-    if (PlayLayer::get() && hideUI) {
-        PlayLayer::get()->getChildByID("UILayer")->setVisible(false);
-        PlayLayer::get()->getChildByID("progress-bar")->setVisible(false);
-        PlayLayer::get()->getChildByID("percentage-label")->setVisible(false);
-    }
-    if (PlayLayer::get() && hidePlayer) {
-        PlayLayer::get()->m_player1->setVisible(false);
-        PlayLayer::get()->m_player2->setVisible(false);
-    }
     if (static_cast<CCNode*>(CCDirector::get()->getRunningScene())->getChildrenCount()) {
         log::info("started visiting");
         CCArrayExt<CCNode*> children = CCDirector::get()->getRunningScene()->getChildren();
         for (auto* child : children) {
-            if (child->getID() == "PauseLayer" || child->getID() == "ScreenshotPopup") {
-                // nothing
-            } else {
-                child->visit();
-                /*if (child->getID() == "LevelEditorLayer" && child->getChildByID("EditorPauseLayer") && child->getChildByID("EditorUI") && static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))) {
-                    child->getChildByID("EditorUI")->setVisible(false);
-                    child->getChildByID("EditorPauseLayer")->setVisible(false);
-                    static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))->setVisible(false);
+            if (child->getID() != "PauseLayer" && child->getID() != "ScreenshotPopup") {
+                if (child->getID() == "PlayLayer") {
+                    CCArrayExt<CCNode*> newchildren = child->getChildren();
+                    for (auto* newchild : newchildren) {
+                        if (newchild->getID() == "UILayer" || newchild->getID() == "progress-bar" || newchild->getID() == "percentage-label" || newchild->getID() == "debug-text" || newchild->getID() == "dankmeme.globed2/game-overlay") {
+                            if (!hideUI) newchild->visit();
+                        } else {
+                            newchild->visit();
+                        }
+                    }
+                } else {
                     child->visit();
-                    child->getChildByID("EditorPauseLayer")->setVisible(true);
-                    child->getChildByID("EditorUI")->setVisible(true);
-                    static_cast<CCNode*>(child->getChildByID("main-node")->getChildByID("batch-layer")->getChildren()->objectAtIndex(0))->setVisible(true);
-                }*/
+                }
             }
         }
         log::info("finished visiting");
     }
     renderer->end();
-    if (PlayLayer::get() && hideUI) {
-        PlayLayer::get()->getChildByID("UILayer")->setVisible(uivisible);
-        PlayLayer::get()->getChildByID("progress-bar")->setVisible(progvisible);
-        PlayLayer::get()->getChildByID("percentage-label")->setVisible(percvisible);
-    }
-    if (PlayLayer::get() && hidePlayer) {
-        PlayLayer::get()->m_player1->setVisible(p1visible);
-        PlayLayer::get()->m_player2->setVisible(p2visible);
-    }
 
     ss.imageData = static_cast<CustomRenderTexture*>(renderer)->getData();
     ss.contentSize = static_cast<CustomRenderTexture*>(renderer)->getSizeInPixels();
