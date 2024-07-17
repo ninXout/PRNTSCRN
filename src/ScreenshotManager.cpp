@@ -99,7 +99,7 @@ void Screenshot::saveImage(bool toClipboard) {
     log::info("about to start windows thread");
     std::thread([=]() {
         log::info("inside windows thread");
-        auto bitmap = CreateBitmap(src_width, src_height, 1, 32, buffer);
+        auto bitmap = CreateBitmap(src_width, src_height, 1, 32, imageData);
         log::info("bitmap created");
 
         if (OpenClipboard(NULL))
