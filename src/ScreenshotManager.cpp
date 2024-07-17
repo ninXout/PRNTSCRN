@@ -109,7 +109,7 @@ void Screenshot::saveImage(bool toClipboard) {
                 log::info("clipboard data set");
                 CloseClipboard();
             }
-        free(buffer);
+        free(imageData);
         log::info("freed the stuff");
     }).detach();
     log::info("left the windows thread");
