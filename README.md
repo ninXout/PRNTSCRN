@@ -1,4 +1,7 @@
 # PRNTSCRN
+
+## This is the old repo, ery has the new one somewhere on his github
+
 This is where she makes a mod.
 
 <img src="logo.png" width="150" alt="the mod's logo" />
